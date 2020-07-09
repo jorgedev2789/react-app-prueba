@@ -2,19 +2,22 @@ import React, { useState } from "react";
 import { Form, Input, InputNumber, Button } from "antd";
 import axios from "axios";
 
-import { Listar } from "./Listar";
+import { Resultado } from "./Resultado";
 
 const FormItem = Form.Item;
 
 export const Filtrar = () => {
+    
     const [form, setForm] = useState({
         formLayout: "horizontal",
-        searchUser: {
+        searchData: {
             user: "",
             token: "",
             userID: "",
         },
     });
+    
+    const [result, setResult] = useState([]);
 
     const { formLayout } = form;
 
@@ -36,10 +39,10 @@ export const Filtrar = () => {
     const changeName = (e) => {
         setForm({
             ...form,
-            searchUser: {
+            searchData: {
                 user: e.target.value,
-                token: form.searchUser.token,
-                userID: form.searchUser.userID,
+                token: form.searchData.token,
+                userID: form.searchData.userID,
             },
         });
     };
@@ -47,10 +50,10 @@ export const Filtrar = () => {
     const changeToken = (e) => {
         setForm({
             ...form,
-            searchUser: {
+            searchData: {
                 token: e,
-                user: form.searchUser.user,
-                userID: form.searchUser.userID,
+                user: form.searchData.user,
+                userID: form.searchData.userID,
             },
         });
     };
@@ -60,18 +63,41 @@ export const Filtrar = () => {
         if (isInteger.test(e)) {
             setForm({
                 ...form,
-                searchUser: {
+                searchData: {
                     userID: e,
-                    user: form.searchUser.user,
-                    token: form.searchUser.token,
+                    user: form.searchData.user,
+                    token: form.searchData.token,
                 },
             });
         }
     };
 
     const handleFilter = () => {
-        console.log("filter");
+        
+        axios
+        .post(
+            "https://www.crmetric.com/srv-crmetric-web-cdc-test/rest/usuario/listarOrigenAcceso",
+            {
+                Sess: {
+                    User: "xchohermenegildo",
+                    Token: "11.8839813279919",
+                    usuario_id: 30,
+                },
+            }
+        )
+        .then((response) => {
+            const data = response.data.data[0].origen_acceso;
+            const cols = Object.keys( data[0] )
+
+            setResult({data:data, columns:cols})
+        })
+        .catch((err) => {
+            console.log("Network " + err);
+        });
+        
     };
+
+    //console.log(result)
 
     return (
         <>
@@ -80,7 +106,7 @@ export const Filtrar = () => {
                 <FormItem label="Usuario" {...formItemLayout}>
                     <Input
                         type="text"
-                        value={form.searchUser.user}
+                        value={form.searchData.user}
                         placeholder="Usuario"
                         onChange={changeName}
                         style={{ width: 250 }}
@@ -88,7 +114,7 @@ export const Filtrar = () => {
                 </FormItem>
                 <FormItem label="Token" {...formItemLayout}>
                     <InputNumber
-                        value={form.searchUser.token}
+                        value={form.searchData.token}
                         placeholder="Token"
                         onChange={changeToken}
                         style={{ width: 250 }}
@@ -96,7 +122,7 @@ export const Filtrar = () => {
                 </FormItem>
                 <FormItem label="Usuario ID" {...formItemLayout}>
                     <InputNumber
-                        value={form.searchUser.userID}
+                        value={form.searchData.userID}
                         placeholder="Usuario ID"
                         onChange={changeUserId}
                         style={{ width: 250 }}
@@ -112,7 +138,7 @@ export const Filtrar = () => {
                     </Button>
                 </FormItem>
             </Form>
-            <Listar />
+            <Resultado result={result} />
         </>
     );
 };
