@@ -7,7 +7,6 @@ import { Resultado } from "./Resultado";
 const FormItem = Form.Item;
 
 export const Filtrar = () => {
-    
     const [form, setForm] = useState({
         formLayout: "horizontal",
         searchData: {
@@ -16,7 +15,7 @@ export const Filtrar = () => {
             userID: "",
         },
     });
-    
+
     const [result, setResult] = useState([]);
 
     const { formLayout } = form;
@@ -73,38 +72,33 @@ export const Filtrar = () => {
     };
 
     const handleFilter = () => {
-        
         axios
-        .post(
-            "https://www.crmetric.com/srv-crmetric-web-cdc-test/rest/usuario/listarOrigenAcceso",
-            {
-                Sess: {
-                    User: form.searchData.user,
-                    Token: form.searchData.token,
-                    usuario_id: form.searchData.userID,
-                },
-            }
-        )
-        .then((response) => {
-            //Construye columnas y data
-            
-            if(response.data.codigo){
-                const data = response.data.data[0].origen_acceso.map(e => ( { ...e, status:true}  ));
-                const cols = Object.keys( data[0] )
+            .post(
+                "https://www.crmetric.com/srv-crmetric-web-cdc-test/rest/usuario/listarOrigenAcceso",
+                {
+                    Sess: {
+                        User: form.searchData.user,
+                        Token: form.searchData.token,
+                        usuario_id: form.searchData.userID,
+                    },
+                }
+            )
+            .then((response) => {
+                if (response.data.codigo) {
+                    const data = response.data.data[0].origen_acceso.map(
+                        (e) => ({ ...e, status: true })
+                    );
+                    const cols = Object.keys(data[0]);
 
-                setResult({data:data, columns:cols})
-
-            }else{
-                setResult({data: [], columns: []})
-            }
-        })
-        .catch((err) => {
-            console.log(err)
-        });
-        
+                    setResult({ data: data, columns: cols });
+                } else {
+                    setResult({ data: [], columns: [] });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
     };
-
-    //console.log(result)
 
     return (
         <>
@@ -145,7 +139,7 @@ export const Filtrar = () => {
                     </Button>
                 </FormItem>
             </Form>
-            { (result.data?.length === 0) && <div>No hay resultados</div>  }
+            {result.data?.length === 0 && <div>No hay resultados</div>}
             <Resultado searchData={form.searchData} result={result} />
         </>
     );
