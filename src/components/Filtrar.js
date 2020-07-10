@@ -79,21 +79,27 @@ export const Filtrar = () => {
             "https://www.crmetric.com/srv-crmetric-web-cdc-test/rest/usuario/listarOrigenAcceso",
             {
                 Sess: {
-                    User: "xchohermenegildo",
-                    Token: "11.8839813279919",
-                    usuario_id: 30,
+                    User: form.searchData.user,
+                    Token: form.searchData.token,
+                    usuario_id: form.searchData.userID,
                 },
             }
         )
         .then((response) => {
             //Construye columnas y data
-            const data = response.data.data[0].origen_acceso.map(e => ( { ...e, status:true}  ));
-            const cols = Object.keys( data[0] )
             
-            setResult({data:data, columns:cols})
+            if(response.data.codigo){
+                const data = response.data.data[0].origen_acceso.map(e => ( { ...e, status:true}  ));
+                const cols = Object.keys( data[0] )
+
+                setResult({data:data, columns:cols})
+
+            }else{
+                setResult({data: [], columns: []})
+            }
         })
         .catch((err) => {
-            console.log("Network " + err);
+            console.log(err)
         });
         
     };
@@ -139,7 +145,8 @@ export const Filtrar = () => {
                     </Button>
                 </FormItem>
             </Form>
-            <Resultado result={result} />
+            { (result.data?.length === 0) && <div>No hay resultados</div>  }
+            <Resultado searchData={form.searchData} result={result} />
         </>
     );
 };

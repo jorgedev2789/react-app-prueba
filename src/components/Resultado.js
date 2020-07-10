@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Form, Input, InputNumber, Button, Radio, Table } from "antd";
+import { Form, Input, Table, notification } from "antd";
+import { SmileOutlined } from '@ant-design/icons';
 
+import axios from "axios";
 const FormItem = Form.Item;
 
-export const Resultado = ({ result }) => {
+export const Resultado = ({ searchData, result }) => {
 
     const showHeader = true;
 
@@ -32,7 +34,34 @@ export const Resultado = ({ result }) => {
         setGrid(prevState => ({ ...prevState,  clone }))
     }
 
-    const handleUpdate = () => {
+    const handleUpdate = (record) => {
+ 
+        axios
+        .post(
+            "https://www.crmetric.com/srv-crmetric-web-cdc-test/rest/usuario/actualizarOrigenAcceso",
+            {
+                Sess: {
+                    "User": searchData.user,
+                    "Token": searchData.token,
+                    "origen_acceso_id": searchData.userID,
+                    "valor_acceso" : record.valor_acceso,
+                    "codigo_estado" : record.codigo_estado,
+                    "usuario_id": 15
+                },
+            }
+        )
+        .then((response) => {
+            if(response.data.codigo){
+                notification.open({
+                    message: 'Notification Title',
+                    description: response.data.mensaje,
+                    icon: <SmileOutlined style={{ color: '#108ee9' }} />,
+                  });
+            }
+        })
+        .catch((err) => {
+            console.log("Network " + err);
+        });
 
     }
     
