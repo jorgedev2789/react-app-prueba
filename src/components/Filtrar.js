@@ -86,9 +86,10 @@ export const Filtrar = () => {
             }
         )
         .then((response) => {
-            const data = response.data.data[0].origen_acceso;
+            //Construye columnas y data
+            const data = response.data.data[0].origen_acceso.map(e => ( { ...e, status:true}  ));
             const cols = Object.keys( data[0] )
-
+            
             setResult({data:data, columns:cols})
         })
         .catch((err) => {
